@@ -1,16 +1,33 @@
 'use strict';
 
-const kakka = require('./services/kakka');
+const axios = require('axios');
+const kakkapylly = require('./services/kakka');
 
 module.exports.kakka = (event, context, callback) => {
 
-  const pieru = kakka.getKakka();
+  axios
+    .get('http://diktaattoriporssi.com/api/dictator/manuel-noriega')
+    .then(ret => {
 
-  const response = {
-    body: JSON.stringify({
-      kakka: pieru,
-    }),
-  }
+      const response = {
+        statusCode: 200,
+        body: JSON.stringify({
+          message: ret.data,
+          ripuli: kakkapylly.getKakka(),
+        }),
+      };
 
-  callback(null, response);
+      callback(null, response);
+    }).catch(e => {
+
+      const response = {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: e
+        })
+      };
+
+      callback(null, response);
+
+    });
 };
